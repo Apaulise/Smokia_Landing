@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { links } from "@/config";
+import Lines from "./Lines";
 
 const TEAM_SIZES = ["Solo yo", "2–10 personas", "11–50 personas", "51–200 personas", "Más de 200"];
 
@@ -63,28 +64,41 @@ export default function Contact() {
     }
   }
 
+  const clear = (k: keyof FieldErrors) => () =>
+    fieldErrors[k] && setFieldErrors((f) => ({ ...f, [k]: undefined }));
+
   return (
-    <section id="contacto" style={{ position: "relative", padding: "clamp(72px,9vw,120px) clamp(18px,5vw,48px)", background: "linear-gradient(180deg, var(--bg), var(--surface) clamp(80px,15vw,180px))" }}>
-      <div data-contact-grid style={{ maxWidth: 1160, margin: "0 auto", display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1.1fr)", gap: "clamp(32px,6vw,80px)", alignItems: "start" }}>
-        <div data-reveal>
-          <div className="mono" style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--signal-text)", marginBottom: 16 }}>— Contacto</div>
-          <h2 style={{ margin: "0 0 28px", fontSize: "clamp(32px,4.6vw,54px)", lineHeight: 1.05, letterSpacing: "-.025em", fontWeight: 600, textWrap: "balance", color: "var(--ink)" }}>Hablemos de tu negocio.</h2>
-          <ul style={{ listStyle: "none", margin: "0 0 32px", padding: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+    <section id="contacto" className="section">
+      <div
+        className="wrap"
+        style={{ display: "grid", gridTemplateColumns: "minmax(0,.95fr) minmax(0,1.05fr)", gap: "clamp(44px,6vw,88px)", alignItems: "start" }}
+        data-contact
+      >
+        <div>
+          <div data-reveal="fade" className="eyebrow" style={{ marginBottom: 26 }}>
+            Contacto
+          </div>
+          <Lines as="h2" className="h2" lines={["Hablemos de tu negocio."]} />
+
+          <ul style={{ listStyle: "none", margin: "clamp(30px,4vw,42px) 0 36px", padding: 0, display: "flex", flexDirection: "column", gap: 0 }} data-stagger="80">
             {BULLETS.map((b) => (
-              <li key={b} style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 16, color: "var(--ink-2)" }}>
-                <span style={{ flex: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: "50%", background: "var(--raised)", color: "var(--ink-2)" }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </span>
+              <li
+                key={b}
+                data-reveal
+                style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 0", borderBottom: "1px solid var(--line)", fontSize: 15.5, color: "var(--ink-2)" }}
+              >
+                <svg width="15" height="15" style={{ flex: "none", color: "var(--smoke-4)" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
                 {b}
               </li>
             ))}
           </ul>
-          <p style={{ margin: "0 0 14px", fontSize: 15, color: "var(--ink-3)" }}>¿Preferís hablar directamente?</p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <a className="btn btn-secondary" href={links.cal} style={{ padding: "13px 22px", fontSize: 15 }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+
+          <p data-reveal className="small" style={{ color: "var(--ink-3)", marginBottom: 16 }}>¿Preferís hablar directamente?</p>
+          <div data-reveal style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <a className="btn btn-ghost" href={links.cal}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" />
                 <line x1="16" y1="2" x2="16" y2="6" />
                 <line x1="8" y1="2" x2="8" y2="6" />
@@ -92,56 +106,58 @@ export default function Contact() {
               </svg>
               Agendar llamada
             </a>
-            <a className="btn btn-wa" href={links.whatsapp} target="_blank" rel="noopener noreferrer" style={{ padding: "13px 22px", fontSize: 15 }}>
-              <span aria-hidden="true" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", background: "#25D366", flexShrink: 0 }}>
-                <FaWhatsapp size={17} color="#fff" />
-              </span>
+            <a className="btn btn-ghost" href={links.whatsapp} target="_blank" rel="noopener noreferrer" style={{ color: "#25D366", borderColor: "#25d36659" }}>
+              <FaWhatsapp size={17} />
               WhatsApp
             </a>
           </div>
         </div>
 
-        <div data-reveal style={{ padding: "clamp(22px,3vw,36px)", borderRadius: "var(--radius-lg)", background: "var(--bg)", border: "1px solid var(--line-strong)", boxShadow: "0 30px 80px -40px rgba(0,0,0,.7)" }}>
+        {/* El formulario sí es un bloque independiente: card con el radio máximo. */}
+        <div
+          data-reveal="media"
+          style={{ padding: "clamp(24px,3.4vw,40px)", borderRadius: "var(--radius-lg)", border: "1px solid var(--line-strong)", background: "#1b1b1ee0", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+        >
           {status === "sent" ? (
-            <div role="status" style={{ padding: "40px 8px", textAlign: "center", animation: "ctaIn .6s cubic-bezier(.16,1,.3,1)" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 52, height: 52, borderRadius: "50%", background: "var(--success-soft)", color: "var(--success)", marginBottom: 18 }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <div role="status" style={{ padding: "40px 8px", textAlign: "center" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 48, height: 48, borderRadius: "var(--radius-lg)", background: "var(--success-soft)", color: "var(--success)", marginBottom: 20 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
-              <h3 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 600, color: "var(--ink)" }}>¡Mensaje enviado!</h3>
-              <p style={{ margin: "0 0 22px", fontSize: 15, lineHeight: 1.6, color: "var(--ink-2)" }}>Gracias por escribirnos. Te respondemos por mail lo antes posible.</p>
-              <button type="button" className="btn btn-secondary" onClick={() => setStatus("idle")} style={{ padding: "11px 20px", fontSize: 14 }}>
+              <h3 className="h3" style={{ marginBottom: 10 }}>Mensaje enviado</h3>
+              <p className="small" style={{ marginBottom: 26 }}>Gracias por escribirnos. Te respondemos por mail lo antes posible.</p>
+              <button type="button" className="btn btn-ghost" onClick={() => setStatus("idle")}>
                 Enviar otro mensaje
               </button>
             </div>
           ) : (
-            <form onSubmit={onSubmit} noValidate style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-              {/* Honeypot: hidden from people, filled by bots */}
+            <form onSubmit={onSubmit} noValidate className="form">
+              {/* Trampa para bots: invisible para personas. */}
               <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
 
-              <div data-contact-row style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-                <label className="cf-field">
+              <div className="f-row">
+                <label className="field">
                   <span>Nombre completo</span>
-                  <input className="cf-input" name="name" type="text" required aria-required="true" aria-invalid={!!fieldErrors.name} aria-describedby={fieldErrors.name ? "err-name" : undefined} onChange={() => fieldErrors.name && setFieldErrors((f) => ({ ...f, name: undefined }))} maxLength={120} autoComplete="name" placeholder="Tu nombre" />
-                  {fieldErrors.name && <small id="err-name" role="alert" className="cf-error">{fieldErrors.name}</small>}
+                  <input className="input" name="name" type="text" required aria-required="true" aria-invalid={!!fieldErrors.name} aria-describedby={fieldErrors.name ? "e-name" : undefined} onChange={clear("name")} maxLength={120} autoComplete="name" placeholder="Tu nombre" />
+                  {fieldErrors.name && <small id="e-name" role="alert" className="err">{fieldErrors.name}</small>}
                 </label>
-                <label className="cf-field">
+                <label className="field">
                   <span>Email</span>
-                  <input className="cf-input" name="email" type="email" required aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? "err-email" : undefined} onChange={() => fieldErrors.email && setFieldErrors((f) => ({ ...f, email: undefined }))} maxLength={200} autoComplete="email" placeholder="tu@empresa.com" />
-                  {fieldErrors.email && <small id="err-email" role="alert" className="cf-error">{fieldErrors.email}</small>}
+                  <input className="input" name="email" type="email" required aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? "e-email" : undefined} onChange={clear("email")} maxLength={200} autoComplete="email" placeholder="tu@empresa.com" />
+                  {fieldErrors.email && <small id="e-email" role="alert" className="err">{fieldErrors.email}</small>}
                 </label>
               </div>
 
-              <div data-contact-row style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-                <label className="cf-field">
+              <div className="f-row">
+                <label className="field">
                   <span>Empresa</span>
-                  <input className="cf-input" name="company" type="text" required aria-required="true" aria-invalid={!!fieldErrors.company} aria-describedby={fieldErrors.company ? "err-company" : undefined} onChange={() => fieldErrors.company && setFieldErrors((f) => ({ ...f, company: undefined }))} maxLength={160} autoComplete="organization" placeholder="Nombre de tu empresa" />
-                  {fieldErrors.company && <small id="err-company" role="alert" className="cf-error">{fieldErrors.company}</small>}
+                  <input className="input" name="company" type="text" required aria-required="true" aria-invalid={!!fieldErrors.company} aria-describedby={fieldErrors.company ? "e-company" : undefined} onChange={clear("company")} maxLength={160} autoComplete="organization" placeholder="Nombre de tu empresa" />
+                  {fieldErrors.company && <small id="e-company" role="alert" className="err">{fieldErrors.company}</small>}
                 </label>
-                <label className="cf-field">
+                <label className="field">
                   <span>Tamaño del equipo <em>(opcional)</em></span>
-                  <select className="cf-input" name="teamSize" defaultValue="">
+                  <select className="input" name="teamSize" defaultValue="">
                     <option value="" disabled>Cantidad de personas</option>
                     {TEAM_SIZES.map((s) => (
                       <option key={s} value={s}>{s}</option>
@@ -150,26 +166,26 @@ export default function Contact() {
                 </label>
               </div>
 
-              <label className="cf-field">
+              <label className="field">
                 <span>¿Qué te gustaría mejorar? <em>(opcional)</em></span>
-                <textarea className="cf-input" name="details" rows={4} maxLength={4000} placeholder="Contanos sobre tu negocio y qué procesos te gustaría mejorar..." />
+                <textarea className="input" name="details" rows={4} maxLength={4000} placeholder="Contanos sobre tu negocio y qué procesos te gustaría mejorar..." />
               </label>
 
-              <label className="cf-field">
+              <label className="field">
                 <span>¿Cómo nos conociste? <em>(opcional)</em></span>
-                <input className="cf-input" name="source" type="text" maxLength={500} placeholder="Instagram, recomendación, Google..." />
+                <input className="input" name="source" type="text" maxLength={500} placeholder="Instagram, recomendación, Google..." />
               </label>
 
               <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16 }}>
-                <button type="submit" disabled={status === "sending"} className="btn btn-primary" style={{ padding: "14px 26px", fontSize: 16, cursor: status === "sending" ? "wait" : "pointer", opacity: status === "sending" ? 0.7 : 1 }}>
+                <button type="submit" disabled={status === "sending"} className="btn btn-primary btn-lg">
                   {status === "sending" ? "Enviando…" : "Enviar mensaje"}
                 </button>
                 {status === "error" && (
-                  <span role="alert" style={{ fontSize: 14, color: "var(--danger)", display: "inline-flex", alignItems: "center", gap: 6 }}>⚠ {error}</span>
+                  <span role="alert" className="err">{error}</span>
                 )}
               </div>
 
-              <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: "var(--ink-3)" }}>
+              <p className="small" style={{ fontSize: 13, color: "var(--ink-3)" }}>
                 Usamos tus datos solamente para responderte. No los compartimos con terceros.
               </p>
             </form>

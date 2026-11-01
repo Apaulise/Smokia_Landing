@@ -1,38 +1,12 @@
-"use client";
-
 import { links } from "@/config";
 import { FaWhatsapp } from "react-icons/fa";
 
+/** Acceso flotante que se expande al enfocarlo. Radio y densidad del sistema. */
 export default function WhatsAppFloat() {
   return (
-    <a
-      href={links.whatsapp}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Escribinos por WhatsApp"
-      style={{
-        position: "fixed",
-        bottom: 24,
-        right: 24,
-        width: 56,
-        height: 56,
-        borderRadius: "50%",
-        background: "linear-gradient(135deg, #25D366, #128C7E)",
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: "0 8px 24px rgba(37, 211, 102, 0.35)",
-        zIndex: 999,
-        transition: "transform 0.2s, box-shadow 0.2s",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = "0 12px 32px rgba(37, 211, 102, 0.5)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = "0 8px 24px rgba(37, 211, 102, 0.35)";
-      }}
-    >
-      <FaWhatsapp size={28} color="white" />
+    <a className="wa" href={links.whatsapp} target="_blank" rel="noopener noreferrer" aria-label="Escribinos por WhatsApp">
+      <FaWhatsapp size={22} />
+      <span aria-hidden="true">Escribinos</span>
     </a>
   );
 }

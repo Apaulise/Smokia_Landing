@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Lines from "./Lines";
 
 const ITEMS = [
   { q: "¿Qué tipo de empresas pueden trabajar con SmokIA?", a: "Pequeñas y medianas empresas, negocios locales, profesionales y empresas de servicios. Si tenés procesos, probablemente haya algo que mejorar." },
@@ -10,7 +11,7 @@ const ITEMS = [
   { q: "¿Cuánto tarda una implementación?", a: "Depende del alcance. Solemos empezar con un prototipo rápido para validar el impacto antes de una implementación completa." },
   { q: "¿Pueden integrarse con herramientas que ya usamos?", a: "Sí. Trabajamos con WhatsApp, planillas, CRMs y las herramientas que ya forman parte de tu operación." },
   { q: "¿Cuánto cuesta desarrollar una solución?", a: "Depende del problema y del impacto esperado. La primera conversación y el análisis inicial no tienen costo ni compromiso." },
-  { q: "¿Cómo sé si mi empresa tiene algo que automatizar?", a: "No necesitás saberlo. Nuestro trabajo comienza justamente analizando cómo funciona hoy tu empresa y detectando oportunidades donde la tecnología pueda generar impacto.", highlight: true },
+  { q: "¿Cómo sé si mi empresa tiene algo que automatizar?", a: "No necesitás saberlo. Nuestro trabajo comienza justamente analizando cómo funciona hoy tu empresa y detectando oportunidades donde la tecnología pueda generar impacto." },
 ];
 
 export default function Faq() {
@@ -18,50 +19,46 @@ export default function Faq() {
   const panels = useRef<(HTMLDivElement | null)[]>([]);
 
   return (
-    <section id="faq" style={{ position: "relative", padding: "clamp(72px,9vw,120px) clamp(18px,5vw,48px)", background: "linear-gradient(180deg, var(--bg), var(--surface) clamp(80px,15vw,180px))" }}>
-      <div style={{ maxWidth: 840, margin: "0 auto" }}>
-        <div data-reveal style={{ marginBottom: "clamp(36px,5vw,52px)" }}>
-          <div className="mono" style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--signal-text)", marginBottom: 16 }}>— Preguntas frecuentes</div>
-          <h2 style={{ margin: 0, fontSize: "clamp(26px,3.6vw,42px)", lineHeight: 1.1, letterSpacing: "-.02em", fontWeight: 600, color: "var(--ink)" }}>Lo que suelen preguntarnos.</h2>
+    <section id="faq" className="section">
+      <div className="wrap-narrow">
+        <div style={{ marginBottom: "clamp(44px,6vw,72px)" }}>
+          <div data-reveal="fade" className="eyebrow" style={{ marginBottom: 26 }}>
+            Preguntas frecuentes
+          </div>
+          <Lines as="h2" className="h2" lines={["Lo que suelen preguntarnos."]} />
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+        <div data-reveal>
           {ITEMS.map((item, i) => {
             const isOpen = open === i;
             return (
-              <div
-                key={item.q}
-                style={{
-                  borderRadius: "var(--radius-md)",
-                  overflow: "hidden",
-                  background: item.highlight ? "var(--signal-soft)" : "var(--raised)",
-                  border: `1px solid ${item.highlight ? "var(--signal)" : "var(--line)"}`,
-                }}
-              >
+              <div className="faq-item" key={item.q}>
                 <button
-                  id={`faq-btn-${i}`}
+                  id={`faq-b-${i}`}
+                  className="faq-q"
                   aria-expanded={isOpen}
-                  aria-controls={`faq-panel-${i}`}
+                  aria-controls={`faq-p-${i}`}
                   onClick={() => setOpen(isOpen ? null : i)}
-                  style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "20px 22px", background: "none", border: "none", color: "var(--ink)", fontSize: 16, fontWeight: 600, textAlign: "left", cursor: "pointer", fontFamily: "inherit" }}
                 >
                   {item.q}
-                  <span style={{ flex: "none", transition: "transform .3s", color: "var(--signal-text)", transform: isOpen ? "rotate(135deg)" : "rotate(0deg)" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                  <span className="faq-ico" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
                       <line x1="12" y1="5" x2="12" y2="19" />
                       <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
                   </span>
                 </button>
                 <div
-                  id={`faq-panel-${i}`}
+                  id={`faq-p-${i}`}
+                  className="faq-a"
                   role="region"
-                  aria-labelledby={`faq-btn-${i}`}
+                  aria-labelledby={`faq-b-${i}`}
                   ref={(el) => {
                     panels.current[i] = el;
                   }}
-                  style={{ maxHeight: isOpen ? (panels.current[i]?.scrollHeight ?? 400) : 0, overflow: "hidden", transition: "max-height .35s ease" }}
+                  style={{ maxHeight: isOpen ? (panels.current[i]?.scrollHeight ?? 400) : 0 }}
                 >
-                  <p style={{ margin: 0, padding: "0 22px 22px", fontSize: 15, lineHeight: 1.6, color: "var(--ink-2)" }}>{item.a}</p>
+                  <p>{item.a}</p>
                 </div>
               </div>
             );

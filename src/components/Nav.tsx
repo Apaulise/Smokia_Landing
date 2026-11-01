@@ -14,82 +14,138 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState<string>("");
+  const menu = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 16);
+      // El sistema admite un solo CTA primario por vista.
+      setPastHero(window.scrollY > window.innerHeight * 0.72);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close the panel when the viewport grows past the mobile breakpoint.
+  // Marca en el nav la sección que se está leyendo.
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 900px)");
+    const ids = NAV_LINKS.map((l) => l.href.slice(1));
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    if (!sections.length) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        // La sección visible más arriba gana.
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActive("#" + visible[0].target.id);
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    sections.forEach((s) => io.observe(s));
+    return () => io.disconnect();
+  }, []);
+
+  // El panel móvil se cierra solo al pasar al layout de escritorio.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 901px)");
     const onChange = () => mq.matches && setOpen(false);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  // Esc cierra el panel.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
-    <nav
-      data-nav
-      className={scrolled ? "nav nav-scrolled" : "nav"}
-      style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 }}
-    >
-      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "14px clamp(18px,5vw,48px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
-        <a href="#top" aria-label="SmokIA inicio" style={{ display: "flex", alignItems: "center", gap: 9, color: "var(--ink)", fontWeight: 600, fontSize: 18, letterSpacing: "-.01em" }}>
-          <Image src="/smokia-mark.png" alt="" width={22} height={22} priority style={{ objectFit: "contain" }} />
+    <nav className={scrolled || open ? "nav nav-on" : "nav"}>
+      <div className="nav-inner">
+        <a href="#top" className="brand" aria-label="SmokIA, inicio">
+          <Image src="/smokia-mark.png" alt="" width={21} height={21} priority style={{ objectFit: "contain" }} />
           <span>
-            Smok<span style={{ color: "var(--ink-3)" }}>IA</span>
+            Smok<span className="dim">IA</span>
           </span>
         </a>
-        <div className="nav-desk" style={{ alignItems: "center", gap: 30 }}>
+
+        <div className="nav-links">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="nav-link">
+            <a key={l.href} href={l.href} className="nav-link" aria-current={active === l.href ? true : undefined}>
               {l.label}
             </a>
           ))}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <a href={links.cta} data-cta="nav_cta" className="nav-cta">
+
+        <div className="nav-right">
+          <a
+            href={links.cta}
+            data-cta="nav_cta"
+            className={`btn nav-cta ${pastHero ? "btn-primary" : "btn-ghost"}`}
+            style={{ padding: "11px 18px" }}
+          >
             Analicemos tu negocio
           </a>
           <button
-            className="nav-burger"
+            className="burger"
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
-            aria-controls="mobile-menu"
+            aria-controls="menu-movil"
             onClick={() => setOpen((o) => !o)}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <line x1="4" y1="7" x2="20" y2="7" />
-              <line x1="4" y1="12" x2="20" y2="12" />
-              <line x1="4" y1="17" x2="20" y2="17" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+              {open ? (
+                <>
+                  <line x1="5" y1="5" x2="19" y2="19" />
+                  <line x1="19" y1="5" x2="5" y2="19" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="7" x2="21" y2="7" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="17" x2="21" y2="17" />
+                </>
+              )}
             </svg>
           </button>
         </div>
       </div>
+
       <div
-        id="mobile-menu"
-        ref={menuRef}
+        id="menu-movil"
+        ref={menu}
         className="nav-mobile"
-        style={{ maxHeight: open ? (menuRef.current?.scrollHeight ?? 400) : 0 }}
+        style={{ maxHeight: open ? (menu.current?.scrollHeight ?? 420) : 0 }}
       >
-        <div style={{ padding: "14px clamp(18px,5vw,48px) 26px", display: "flex", flexDirection: "column", gap: 4 }}>
-          {NAV_LINKS.map((l, i) => (
+        <div className="nav-mobile-in">
+          {NAV_LINKS.map((l) => (
             <a
               key={l.href}
               href={l.href}
+              className="nav-mobile-link"
               onClick={() => setOpen(false)}
               tabIndex={open ? 0 : -1}
-              style={{ padding: "13px 4px", color: "var(--ink-2)", fontSize: 16, fontWeight: 500, borderBottom: i < NAV_LINKS.length - 1 ? "1px solid var(--line)" : undefined }}
             >
               {l.label}
             </a>
           ))}
-          <a href={links.cta} data-cta="nav_mobile_cta" onClick={() => setOpen(false)} tabIndex={open ? 0 : -1} className="nav-cta" style={{ justifyContent: "center", marginTop: 14 }}>
+          <a
+            href={links.cta}
+            data-cta="nav_mobile_cta"
+            className="btn btn-primary"
+            onClick={() => setOpen(false)}
+            tabIndex={open ? 0 : -1}
+            style={{ marginTop: 20 }}
+          >
             Analicemos tu negocio
           </a>
         </div>

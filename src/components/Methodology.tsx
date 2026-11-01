@@ -1,82 +1,90 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { links } from "@/config";
+import Lines from "./Lines";
+
+const STEPS = [
+  { n: "01", t: "Descubrimiento", d: "Conversamos sobre cómo funciona actualmente tu negocio." },
+  { n: "02", t: "Auditoría", d: "Analizamos procesos y encontramos oportunidades concretas." },
+  { n: "03", t: "Propuesta", d: "Definimos una solución concreta y el impacto esperado." },
+  { n: "04", t: "Prototipo", d: "Construimos rápidamente una primera versión funcional." },
+  { n: "05", t: "Implementación", d: "Integramos la solución dentro del flujo real de trabajo." },
+  { n: "06", t: "Medición", d: "Analizamos resultados y buscamos nuevas mejoras." },
+];
 
 export default function Methodology() {
+  const tl = useRef<HTMLDivElement>(null);
+  const [reached, setReached] = useState(0);
+
+  // La línea se dibuja a medida que el timeline cruza la mitad de la pantalla,
+  // y cada paso se "enciende" al llegar. Es el gesto de humo del sistema,
+  // llevado a la narrativa de la página.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setReached(STEPS.length);
+      return;
+    }
+    const el = tl.current;
+    if (!el) return;
+    let raf = 0;
+
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const mark = window.innerHeight * 0.58;
+      const p = Math.min(1, Math.max(0, (mark - r.top) / Math.max(1, r.height)));
+      el.style.setProperty("--tp", String(p));
+      setReached(Math.round(p * STEPS.length));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
   return (
-    <section id="metodologia" style={{ position: "relative", padding: "clamp(72px,9vw,120px) clamp(18px,5vw,48px)", background: "linear-gradient(180deg, var(--bg), var(--surface) clamp(80px,15vw,180px))" }}>
-      <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
-        <div data-reveal style={{ maxWidth: "780px", marginBottom: "clamp(48px,6vw,72px)" }}>
-          <div className="mono" style={{ fontSize: "12px", letterSpacing: ".12em", textTransform: "uppercase", color: "var(--signal-text)", marginBottom: "18px" }}>— Metodología</div>
-          <h2 style={{ margin: "0", fontSize: "clamp(26px,3.8vw,42px)", lineHeight: "1.14", letterSpacing: "-.02em", fontWeight: "600", textWrap: "balance", color: "var(--ink)" }}>
-            No empezamos hablando de Inteligencia Artificial.
-            <br />
-            <span style={{ background: "linear-gradient(90deg,var(--signal),var(--smoke-4))", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>Empezamos hablando de tu negocio.</span>
-          </h2>
+    <section id="metodologia" className="section">
+      <div className="wrap-narrow">
+        <div style={{ marginBottom: "clamp(52px,7vw,88px)" }}>
+          <div data-reveal="fade" className="eyebrow" style={{ marginBottom: 26 }}>
+            Metodología
+          </div>
+          <Lines
+            as="h2"
+            className="h2"
+            lines={[
+              "No empezamos hablando",
+              "de Inteligencia Artificial.",
+              <span key="3" className="dim">Empezamos hablando de tu negocio.</span>,
+            ]}
+          />
         </div>
-        <div data-timeline style={{ position: "relative", display: "flex", flexDirection: "column", gap: "6px" }}>
-          <div data-reveal data-step style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "22px", padding: "18px 0" }}>
-            <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span className="mono" style={{ width: "44px", height: "44px", flex: "none", borderRadius: "var(--radius-md)", background: "var(--raised)", border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "14px", color: "var(--ink-2)" }}>01</span>
-              <span data-line style={{ flex: "1", width: "2px", background: "var(--line-strong)", marginTop: "6px" }}></span>
+
+        <div className="tl" ref={tl}>
+          {STEPS.map((s, i) => (
+            <div className={`tl-step${i < reached ? " on" : ""}`} key={s.n}>
+              <span className="tl-n mono">{s.n}</span>
+              <div className="tl-body">
+                <h3 className="h4" style={{ marginBottom: 6 }}>{s.t}</h3>
+                <p className="small">{s.d}</p>
+              </div>
             </div>
-            <div style={{ paddingBottom: "8px" }}>
-              <h3 style={{ margin: "0 0 6px", fontSize: "19px", fontWeight: "600", color: "var(--ink)" }}>Descubrimiento</h3>
-              <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.55", color: "var(--ink-2)" }}>Conversamos sobre cómo funciona actualmente tu negocio.</p>
-            </div>
-          </div>
-          <div data-reveal data-step style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "22px", padding: "18px 0" }}>
-            <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span className="mono" style={{ width: "44px", height: "44px", flex: "none", borderRadius: "var(--radius-md)", background: "var(--raised)", border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "14px", color: "var(--ink-2)" }}>02</span>
-              <span data-line style={{ flex: "1", width: "2px", background: "var(--line-strong)", marginTop: "6px" }}></span>
-            </div>
-            <div style={{ paddingBottom: "8px" }}>
-              <h3 style={{ margin: "0 0 6px", fontSize: "19px", fontWeight: "600", color: "var(--ink)" }}>Auditoría</h3>
-              <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.55", color: "var(--ink-2)" }}>Analizamos procesos y encontramos oportunidades concretas.</p>
-            </div>
-          </div>
-          <div data-reveal data-step style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "22px", padding: "18px 0" }}>
-            <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span className="mono" style={{ width: "44px", height: "44px", flex: "none", borderRadius: "var(--radius-md)", background: "var(--raised)", border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "14px", color: "var(--ink-2)" }}>03</span>
-              <span data-line style={{ flex: "1", width: "2px", background: "var(--line-strong)", marginTop: "6px" }}></span>
-            </div>
-            <div style={{ paddingBottom: "8px" }}>
-              <h3 style={{ margin: "0 0 6px", fontSize: "19px", fontWeight: "600", color: "var(--ink)" }}>Propuesta</h3>
-              <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.55", color: "var(--ink-2)" }}>Definimos una solución concreta y el impacto esperado.</p>
-            </div>
-          </div>
-          <div data-reveal data-step style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "22px", padding: "18px 0" }}>
-            <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span className="mono" style={{ width: "44px", height: "44px", flex: "none", borderRadius: "var(--radius-md)", background: "var(--raised)", border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "14px", color: "var(--ink-2)" }}>04</span>
-              <span data-line style={{ flex: "1", width: "2px", background: "var(--line-strong)", marginTop: "6px" }}></span>
-            </div>
-            <div style={{ paddingBottom: "8px" }}>
-              <h3 style={{ margin: "0 0 6px", fontSize: "19px", fontWeight: "600", color: "var(--ink)" }}>Prototipo</h3>
-              <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.55", color: "var(--ink-2)" }}>Construimos rápidamente una primera versión funcional.</p>
-            </div>
-          </div>
-          <div data-reveal data-step style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "22px", padding: "18px 0" }}>
-            <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span className="mono" style={{ width: "44px", height: "44px", flex: "none", borderRadius: "var(--radius-md)", background: "var(--raised)", border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "14px", color: "var(--ink-2)" }}>05</span>
-              <span data-line style={{ flex: "1", width: "2px", background: "var(--line-strong)", marginTop: "6px" }}></span>
-            </div>
-            <div style={{ paddingBottom: "8px" }}>
-              <h3 style={{ margin: "0 0 6px", fontSize: "19px", fontWeight: "600", color: "var(--ink)" }}>Implementación</h3>
-              <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.55", color: "var(--ink-2)" }}>Integramos la solución dentro del flujo real de trabajo.</p>
-            </div>
-          </div>
-          <div data-reveal data-step style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "22px", padding: "18px 0" }}>
-            <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <span className="mono" style={{ width: "44px", height: "44px", flex: "none", borderRadius: "var(--radius-md)", background: "var(--signal-soft)", border: "1px solid var(--signal)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "14px", color: "var(--signal-text)" }}>06</span>
-            </div>
-            <div>
-              <h3 style={{ margin: "0 0 6px", fontSize: "19px", fontWeight: "600", color: "var(--ink)" }}>Medición</h3>
-              <p style={{ margin: "0", fontSize: "15px", lineHeight: "1.55", color: "var(--ink-2)" }}>Analizamos resultados y buscamos nuevas mejoras.</p>
-            </div>
-          </div>
+          ))}
         </div>
-        <div data-reveal style={{ marginTop: "44px", textAlign: "center" }}>
-          <a className="btn btn-outline-signal" href={links.cta} data-cta="methodology_cta" style={{ padding: "14px 26px", fontSize: "15px" }}>
-            {"Empecemos por el paso 01 "}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+
+        <div data-reveal style={{ marginTop: "clamp(44px,6vw,64px)", paddingLeft: 68 }}>
+          <a className="arrow-link" href={links.cta} data-cta="methodology_cta">
+            Empecemos por el paso 01
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>
