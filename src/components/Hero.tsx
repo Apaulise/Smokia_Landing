@@ -1,5 +1,6 @@
 import { links } from "@/config";
 import Lines from "./Lines";
+import HeroShowreel from "./HeroShowreel";
 
 const Arrow = ({ s = 17 }: { s?: number }) => (
   <svg className="arr" width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -22,7 +23,7 @@ export default function Hero() {
       }}
     >
       <div className="wrap" style={{ width: "100%" }}>
-        {/* El campo de partículas ocupa la mitad derecha; el texto, la izquierda. */}
+        <div className="hero-grid">
         <div style={{ maxWidth: "min(800px, 94%)" }}>
           <div data-reveal="fade" className="eyebrow" style={{ marginBottom: "clamp(24px,3vw,34px)" }}>
             AI · Automatización · Software
@@ -67,6 +68,11 @@ export default function Hero() {
             </svg>
             Primera conversación sin compromiso.
           </p>
+        </div>
+
+        <div data-reveal="fade" style={{ ["--rd" as string]: "300ms" }}>
+          <HeroShowreel />
+        </div>
         </div>
       </div>
 
