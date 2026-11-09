@@ -585,3 +585,32 @@ textarea.input{resize:vertical;min-height:104px}
 @media (prefers-reduced-motion:reduce){
   .showreel-video,.showreel-glow{transition:none}
 }
+
+/* ==========================================================================
+   Escenario 3D — capa de humo + inclinación de maquetas
+   Sólo AGREGA: no cambia ningún token ni regla existente.
+   ========================================================================== */
+
+/* Humo: los grises del sistema, a baja opacidad, detrás del campo de partículas.
+   Sin brillo ni color de marca: el sistema prohíbe glow y neón. */
+.stage-smoke{
+  position:fixed;inset:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
+
+/* Maquetas: se inclinan hacia el puntero (±3.5°). 150 ms ease-out, como todo
+   control del sistema; al soltar vuelven con la transición base de .panel.
+   Sólo puntero fino: en táctil y con reduced-motion no existe (ver Tilt3D). */
+@media (hover:hover) and (pointer:fine){
+  .panel[data-tilt]{
+    transform:perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translate3d(0,-3px,0);
+    transition:border-color .3s ease-out,transform 150ms ease-out;
+  }
+}
+
+/* Escenario cinematográfico (CinematicStage): shader a pantalla completa,
+   detrás del campo de partículas y del contenido. */
+.stage-gl{
+  position:fixed;inset:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;display:block;
+}

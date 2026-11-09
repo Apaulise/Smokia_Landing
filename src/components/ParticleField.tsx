@@ -18,10 +18,10 @@ import { useEffect, useRef } from "react";
  * por scroll: sin bucle, sin deriva, sin puntero.
  */
 
-type Pt = { x: number; y: number };
+export type Pt = { x: number; y: number };
 
 /** PRNG determinista: las formas son idénticas en cada carga y cada resize. */
-function rng(seed: number) {
+export function rng(seed: number) {
   let s = seed >>> 0;
   return () => {
     s = (s * 1664525 + 1013904223) >>> 0;
@@ -29,7 +29,7 @@ function rng(seed: number) {
   };
 }
 
-type ShapeDef = {
+export type ShapeDef = {
   /** Punto objetivo de la partícula i, en coordenadas normalizadas (~[-1,1]). */
   at: (i: number, n: number, r: () => number) => Pt;
   /**
@@ -53,13 +53,13 @@ type ShapeDef = {
   content?: number;
 };
 
-const TAU = Math.PI * 2;
+export const TAU = Math.PI * 2;
 
 /** Anchos de columna del layout: .wrap (--page-max) y .wrap-narrow. */
-const COL_WIDE = 1160;
-const COL_NARROW = 860;
+export const COL_WIDE = 1160;
+export const COL_NARROW = 860;
 
-const SHAPES: ShapeDef[] = [
+export const SHAPES: ShapeDef[] = [
   // 0 · ONDAS — el logo de SmokIA. Tres cintas de humo que se propagan.
   {
     role: "free",
@@ -166,7 +166,7 @@ const SHAPES: ShapeDef[] = [
 ];
 
 /** Lee los tokens del sistema para que el canvas nunca tenga hex propios. */
-function readTokens(el: HTMLElement) {
+export function readTokens(el: HTMLElement) {
   const cs = getComputedStyle(el);
   const v = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
   return {

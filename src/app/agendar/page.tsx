@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { links } from "@/config";
 import CalEmbed from "@/components/CalEmbed";
-import ParticleField from "@/components/ParticleField";
+import ParticleField from "@/components/ParticleField3D";
 
 export const metadata: Metadata = {
   title: "Agendar llamada — SmokIA",
