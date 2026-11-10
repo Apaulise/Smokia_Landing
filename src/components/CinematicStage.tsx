@@ -37,7 +37,7 @@ precision mediump float;
 #endif
 uniform float uTime; uniform vec2 uRes; uniform float uScene; uniform vec2 uMouse;
 uniform float uIntro; uniform float uPx; uniform float uVel; uniform float uSide;
-uniform float uDrift; uniform float uHeroY; uniform float uFinY;
+uniform float uDrift; uniform float uHeroY; uniform float uHeroX; uniform float uFinY;
 uniform vec4 uR[24]; uniform float uRk[24]; uniform float uRn; uniform float uPad;
 uniform vec3 uBg; uniform vec3 uSig; uniform vec3 uS1; uniform vec3 uS2; uniform vec3 uS4; uniform vec3 uInk;
 varying vec2 vUv;
@@ -90,7 +90,7 @@ vec3 dust(vec2 p, float t){
 /* ---------------- 0 / 4: eclipse de señal ---------------- */
 vec3 eclipse(vec2 p, float v){
   float t = uTime;
-  vec2 c = v < .5 ? vec2(mix(0., gAsp * .5, uSide), uHeroY + mix(-.62, .02, uSide))
+  vec2 c = v < .5 ? vec2(mix(0., uHeroX, uSide), uHeroY + mix(-.62, 0., uSide))
                   : vec2(0., uFinY);
   float R0 = (v < .5 ? mix(.44, .60, uSide) : mix(.62, .82, uSide)) * mix(.5, 1., uIntro) + .004 * sin(t * .7);
   vec2 q = p - c - (uMouse - .5) * .07;
@@ -416,7 +416,7 @@ export default function CinematicStage() {
     const U = (n: string) => gl.getUniformLocation(prog, n);
     const u = {
       time: U("uTime"), res: U("uRes"), scene: U("uScene"), mouse: U("uMouse"), intro: U("uIntro"),
-      px: U("uPx"), vel: U("uVel"), side: U("uSide"), drift: U("uDrift"), heroY: U("uHeroY"), finY: U("uFinY"),
+      px: U("uPx"), vel: U("uVel"), side: U("uSide"), drift: U("uDrift"), heroY: U("uHeroY"), heroX: U("uHeroX"), finY: U("uFinY"),
       rects: U("uR"), caps: U("uRk"), rn: U("uRn"), pad: U("uPad"),
     };
     const rectBuf = new Float32Array(MAX_RECTS * 4);
@@ -438,7 +438,7 @@ export default function CinematicStage() {
     /* ---------- Layout: dónde empieza cada escena en el documento ---------- */
     let vh = window.innerHeight;
     let bounds: number[] = [];
-    let heroC = 0, finC = 0;
+    let heroC = 0, finC = 0, heroCx = -1;
     let texts: Rect[] = [];
     const measure = () => {
       vh = window.innerHeight;
@@ -452,6 +452,13 @@ export default function CinematicStage() {
       for (let i = 1; i < n; i++) if (scenes[i] !== scenes[i - 1]) bounds.push(top(kids[i]));
       const hero = kids[0];
       heroC = top(hero) + Math.min(hero.offsetHeight, vh) * 0.5;
+      // En escritorio el anillo se centra exactamente sobre el showreel.
+      heroCx = -1;
+      const reel = hero.querySelector<HTMLElement>(".showreel");
+      if (reel) {
+        const b = reel.getBoundingClientRect();
+        if (b.width > 0) { heroC = b.top + sy + b.height / 2; heroCx = b.left + b.width / 2; }
+      }
       const fin = kids[scenes.indexOf(4)] ?? kids[n - 1];
       finC = top(fin) + fin.offsetHeight * 0.5;
       texts = collectText();
@@ -521,6 +528,11 @@ export default function CinematicStage() {
       gl.uniform1f(u.side, sideMq.matches ? 1 : 0);
       gl.uniform1f(u.drift, sy / Math.max(1, vh));
       gl.uniform1f(u.heroY, toP(heroC, sy));
+      {
+        const asp = cv.width / Math.max(1, cv.height);
+        const sc = Math.max(1, 0.8 / asp);
+        gl.uniform1f(u.heroX, heroCx >= 0 ? (heroCx / Math.max(1, window.innerWidth) - 0.5) * 2 * asp * sc : asp * 0.5);
+      }
       gl.uniform1f(u.finY, toP(finC, sy));
       // Bloques de texto visibles → px del canvas (y hacia arriba).
       const pad = 96;
